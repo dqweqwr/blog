@@ -1,0 +1,19 @@
+### read
+
+GET http://localhost:3003/api/blogs
+
+### create
+
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+  "title": "Hello world",
+  "author": "Will",
+  "url": "willsblog.com",
+  "likes": 2000
+}
+
+### path that doesnt exist
+
+GET http://localhost:3003/does/not/exist
