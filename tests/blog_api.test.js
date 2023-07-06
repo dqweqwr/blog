@@ -25,6 +25,8 @@ const initialBlogs = [
   },
 ]
 
+mongoose.set("bufferTimeoutMS", 20000)
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -34,8 +36,6 @@ beforeEach(async () => {
     .map(blog => blog.save())
   await Promise.all(promiseArray)
 })
-
-mongoose.set("bufferTimeoutMS", 20000)
 
 describe("GET /api/blogs", () => {
   test("list of blogs is returned as json", async () => {
@@ -124,6 +124,57 @@ describe("POST /api/blogs", () => {
     await api.post("/api/blogs")
       .send(newBlog)
       .expect(400)
+  })
+})
+
+describe("PUT /api/blogs/:id", () => {
+  test("updates a blog correctly", async () => {
+    const blogsAtStart = await Blog.find({})
+
+    const firstBlog = blogsAtStart[0]
+    const newBlog = {
+      ...firstBlog,
+      likes: firstBlog.likes + 1
+    }
+
+    await api
+      .put(`/api/blogs/${firstBlog.id}`)
+      .send(newBlog)
+      .expect(200)
+
+    const updatedBlog = await Blog.findById(firstBlog.id)
+    expect(updatedBlog.likes).toBe(firstBlog.likes + 1)
+  })
+
+  test("does not update blog if updated fields are invalid", async () => {
+    const blogsAtStart = await Blog.find({})
+    const firstBlog = blogsAtStart[0]
+    const newBlog = {
+      ...firstBlog,
+      url: null
+    }
+
+    await api
+      .put(`/api/blogs/${firstBlog.id}`)
+      .send(newBlog)
+      .expect(400)
+  })
+})
+
+describe("DELETE /api/blogs/:id", () => {
+  test("successfully deletes blog", async () => {
+    const blogsAtStart = await Blog.find({})
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await Blog.find({})
+    expect(blogsAtStart.length - 1).toBe(blogsAtEnd.length)
+
+    const blogIds = blogsAtEnd.map(blog => blog.id)
+    expect(blogIds).not.toContain(blogToDelete.id)
   })
 })
 
