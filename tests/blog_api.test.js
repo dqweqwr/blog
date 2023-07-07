@@ -138,6 +138,41 @@ describe("PUT /api/blogs/:id", () => {
       .send(newBlog)
       .expect(400)
   })
+
+  test("returns status code 400 for malformatted id", async () => {
+    const id = "asdf"
+    const newBlog = {
+      title: "Hello world",
+      author: "Bob",
+      url: "bobsblog.com",
+      likes: 2000
+    }
+
+    const response = await api
+      .put(`/api/blogs/${id}`)
+      .send(newBlog)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    expect(response.body.error).toBe("malformatted id")
+  })
+
+  test("returns status code 404 for blog that doesnt exist", async () => {
+    const nonExistentBlog = await helper.nonExistentBlog()
+    const nonExistentId = nonExistentBlog._id.toString()
+
+    const newBlog = {
+      title: "Hello world",
+      author: "Bob",
+      url: "bobsblog.com",
+      likes: 2000
+    }
+
+    await api
+      .put(`/api/blogs/${nonExistentId}`)
+      .send(newBlog)
+      .expect(404)
+  })
 })
 
 describe("DELETE /api/blogs/:id", () => {

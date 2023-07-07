@@ -27,7 +27,9 @@ blogsRouter.put("/:id", async (request, response) => {
     { new: true, runValidators: true, context: "query" }
   )
 
-  response.json(updatedNote)
+  updatedNote === null 
+    ? response.status(404).json({ error: "Note does not exist"})
+    : response.json(updatedNote)
 })
 
 module.exports = blogsRouter
