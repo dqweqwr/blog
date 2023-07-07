@@ -5,6 +5,12 @@ const bcrypt = require("bcrypt")
 usersRouter.post("/", async (request, response) => {
   const { username, name, password } = request.body
 
+  if (password.length < 6) {
+    return response.status(400).send({
+      error: "password has to be at least 6 characters"
+    })
+  }
+
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 

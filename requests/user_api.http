@@ -22,4 +22,15 @@ content-type: application/json
 
 ###
 
+POST http://localhost:3003/api/users
+content-type: application/json
+
+{
+  "username": "aaaa",
+  "name": "asdf",
+  "password": "1"
+}
+
+###
+
 GET http://localhost:3003/api/users
