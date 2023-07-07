@@ -3,34 +3,14 @@ const supertest = require("supertest")
 const app = require("../app")
 const api = supertest(app)
 const Blog = require("../models/blog")
-
-const initialBlogs = [
-  {
-    title: "Bob's blog",
-    author: "Bob",
-    url: "https://www.bobsblog.com",
-    likes: 20,
-  },
-  {
-    title: "Jeff's blog",
-    author: "Jeff",
-    url: "https://www.jeffsblog.com",
-    likes: 10,
-  },
-  {
-    title: "Will's blog",
-    author: "Will",
-    url: "https://www.willsblog.com",
-    likes: 3,
-  },
-]
+const helper = require("./blog_api_test_helper")
 
 mongoose.set("bufferTimeoutMS", 20000)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
 
-  const blogObjects = initialBlogs
+  const blogObjects = helper.initialBlogs
     .map(blog => new Blog(blog))
   const promiseArray = blogObjects
     .map(blog => blog.save())
@@ -49,7 +29,7 @@ describe("GET /api/blogs", () => {
     const response = await api
       .get("/api/blogs")
 
-    expect(response.body).toHaveLength(initialBlogs.length)
+    expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
   test("unique identifier of blog posts is named 'id'", async () => {
@@ -76,10 +56,9 @@ describe("POST /api/blogs", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/)
 
-    const blogsInDb = await Blog.find({})
-    const blogsAtEnd = blogsInDb.map(blog => blog.toJSON())
+    const blogsAtEnd = await helper.getBlogs()
 
-    expect(blogsAtEnd.length).toBe(initialBlogs.length + 1)
+    expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
     const titles = blogsAtEnd.map(blog => blog.title)
     expect(titles).toContain("new blog asdf")
@@ -129,7 +108,7 @@ describe("POST /api/blogs", () => {
 
 describe("PUT /api/blogs/:id", () => {
   test("updates a blog correctly", async () => {
-    const blogsAtStart = await Blog.find({})
+    const blogsAtStart = await helper.getBlogs()
 
     const firstBlog = blogsAtStart[0]
     const newBlog = {
@@ -147,7 +126,7 @@ describe("PUT /api/blogs/:id", () => {
   })
 
   test("does not update blog if updated fields are invalid", async () => {
-    const blogsAtStart = await Blog.find({})
+    const blogsAtStart = await helper.getBlogs()
     const firstBlog = blogsAtStart[0]
     const newBlog = {
       ...firstBlog,
@@ -163,14 +142,14 @@ describe("PUT /api/blogs/:id", () => {
 
 describe("DELETE /api/blogs/:id", () => {
   test("successfully deletes blog", async () => {
-    const blogsAtStart = await Blog.find({})
+    const blogsAtStart = await helper.getBlogs()
     const blogToDelete = blogsAtStart[0]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
       .expect(204)
 
-    const blogsAtEnd = await Blog.find({})
+    const blogsAtEnd = await helper.getBlogs()
     expect(blogsAtStart.length - 1).toBe(blogsAtEnd.length)
 
     const blogIds = blogsAtEnd.map(blog => blog.id)
