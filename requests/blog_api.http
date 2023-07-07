@@ -8,10 +8,11 @@ POST http://localhost:3003/api/blogs
 content-type: application/json
 
 {
-  "title": "Hello world",
-  "author": "Bob",
-  "url": "bobsblog.com",
-  "likes": 2000
+  "title": "aarons blog",
+  "author": "Aaron",
+  "url": "aaronsblog.com",
+  "likes": 500,
+  "userId": "64a871d1d0ec3489610f82ec"
 }
 
 ### path that doesnt exist
@@ -21,3 +22,15 @@ GET http://localhost:3003/does/not/exist
 ### delete
 
 DELETE http://localhost:3003/api/blogs/64a4a9253604b05811a4eaee
+
+### update
+
+PUT http://localhost:3003/api/blogs/64a4a9253604b05811a4eaee
+content-type: application/json
+
+{
+  "title": "Hello world",
+  "author": "Bob",
+  "url": "bobsblog.com",
+  "likes": 2000
+}
