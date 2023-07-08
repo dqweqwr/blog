@@ -11,12 +11,6 @@ blogsRouter.get("/", async (request, response) => {
 
 blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   const body = request.body
-  let decodedToken = undefined
-  try {
-    decodedToken = jwt.verify(request.token, process.env.SECRET)
-  } catch (e) {
-    return response.status(401).json({ error: "token invalid" })
-  }
   const user = request.user
 
   const blog = new Blog({
@@ -33,13 +27,15 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 
 blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
   const user = request.user
-
   const blog = await Blog.findById(request.params.id)
+
   if (blog === null) return response.status(204).end()
 
-  if (blog.user.toString() === user.id.toString()) {
-    await Blog.findByIdAndRemove(request.params.id)
+  if (blog.user.toString() !== user.id.toString()) {
+    return response.status(401).json({ error: "you dont own this resource" })
   }
+
+  await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
 })
 

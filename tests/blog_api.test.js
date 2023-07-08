@@ -3,18 +3,26 @@ const supertest = require("supertest")
 const app = require("../app")
 const api = supertest(app)
 const Blog = require("../models/blog")
+const User = require("../models/user")
 const helper = require("./blog_api_test_helper")
 
 mongoose.set("bufferTimeoutMS", 20000)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
-  const blogObjects = helper.initialBlogs
-    .map(blog => new Blog(blog))
-  const promiseArray = blogObjects
-    .map(blog => blog.save())
-  await Promise.all(promiseArray)
+  const alice = await helper.createUser("alice")
+
+  for (let blog of helper.initialBlogs) {
+    const blogObject = new Blog({
+      ...blog,
+      user: alice._id
+    })
+    const savedBlog = await blogObject.save()
+    alice.blogs = alice.blogs.concat(savedBlog._id)
+    await alice.save()
+  }
 }, 100000)
 
 describe("GET /api/blogs", () => {
@@ -44,6 +52,9 @@ describe("GET /api/blogs", () => {
 
 describe("POST /api/blogs", () => {
   test("successfully creates a new blog", async () => {
+    const user = await User.findOne({ username: "alice" })
+    const token = helper.generateToken(user)
+
     const newBlog = {
       title: "new blog asdf",
       author: "abc",
@@ -51,7 +62,9 @@ describe("POST /api/blogs", () => {
       likes: 20,
     }
 
-    await api.post("/api/blogs")
+    const response = await api
+      .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
@@ -65,6 +78,9 @@ describe("POST /api/blogs", () => {
   })
 
   test("When likes property is missing from request body, set default value to 0", async () => {
+    const user = await User.findOne({ username: "alice" })
+    const token = helper.generateToken(user)
+
     const newBlog = {
       title: "another new blog",
       author: "asdf",
@@ -73,6 +89,7 @@ describe("POST /api/blogs", () => {
 
     const response = await api
       .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
@@ -82,6 +99,9 @@ describe("POST /api/blogs", () => {
   })
 
   test("when title is missing, response code is 400", async () => {
+    const user = await User.findOne({ username: "alice" })
+    const token = helper.generateToken(user)
+
     const newBlog = {
       author: "forgot the title",
       url: "https://www.asdf.com",
@@ -89,11 +109,15 @@ describe("POST /api/blogs", () => {
     }
 
     await api.post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
   })
 
   test("when author is missing, response code is 400", async () => {
+    const user = await User.findOne({ username: "alice" })
+    const token = helper.generateToken(user)
+
     const newBlog = {
       title: "new blog",
       author: "forgot the url",
@@ -101,8 +125,24 @@ describe("POST /api/blogs", () => {
     }
 
     await api.post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
+  })
+
+  test("when no token is given, response code is 401", async () => {
+    const newBlog = {
+      title: "new blog asdf",
+      author: "abc",
+      url: "https://www.asdf.com",
+      likes: 20,
+    }
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(401)
+      .expect("Content-Type", /application\/json/)
   })
 })
 
@@ -176,12 +216,16 @@ describe("PUT /api/blogs/:id", () => {
 })
 
 describe("DELETE /api/blogs/:id", () => {
-  test("successfully deletes blog", async () => {
+  test("successfully deletes blog if id of user in decrypted token and blog id match", async () => {
+    const user = await User.findOne({ username: "alice" })
+    const token = helper.generateToken(user)
+
     const blogsAtStart = await helper.getBlogs()
     const blogToDelete = blogsAtStart[0]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("Authorization", `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.getBlogs()
@@ -189,6 +233,22 @@ describe("DELETE /api/blogs/:id", () => {
 
     const blogIds = blogsAtEnd.map(blog => blog.id)
     expect(blogIds).not.toContain(blogToDelete.id)
+  })
+
+  test("returns 401 and does not delete blog when user who doesnt own the blog trys to delete it", async () => {
+    const user = await helper.createUser("bob")
+    const token = helper.generateToken(user)
+
+    const blogsAtStart = await helper.getBlogs()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(401)
+
+    const blogsAtEnd = await helper.getBlogs()
+    expect(blogsAtStart.length).toBe(blogsAtEnd.length)
   })
 })
 

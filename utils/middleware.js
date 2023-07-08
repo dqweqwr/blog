@@ -11,16 +11,15 @@ const tokenExtractor = (request, response, next) => {
 }
 
 const userExtractor = async (request, response, next) => {
-  try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    const user = await User.findById(decodedToken.id)
-    if (user !== null) {
-      request.user = user
-    }
-    next()
-  } catch (e) {
-    next()
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    response.status(401).json({ error: "token invalid" })
   }
+  const user = await User.findById(decodedToken.id)
+  if (user !== null) {
+    request.user = user
+  }
+  next()
 }
 
 const requestLogger = (request, response, next) => {
@@ -43,7 +42,9 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === "CastError") {
     response.status(400).json({ error: "malformatted id" })
   } else if (error.name === "JsonWebTokenError") {
-    response.status(400).json({ error: error.message })
+    response.status(401).json({ error: error.message })
+  } else if (error.name === "SyntaxError") {
+    response.status(401).json({ error: "invalid token" })
   }
 
   next(error)
