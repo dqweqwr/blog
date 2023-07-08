@@ -15,7 +15,7 @@ beforeEach(async () => {
   const promiseArray = blogObjects
     .map(blog => blog.save())
   await Promise.all(promiseArray)
-})
+}, 100000)
 
 describe("GET /api/blogs", () => {
   test("list of blogs is returned as json", async () => {

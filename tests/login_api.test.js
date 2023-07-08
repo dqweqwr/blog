@@ -48,7 +48,7 @@ describe("POST /api/login", () => {
       .expect(401)
       .expect("Content-Type", /application\/json/)
 
-    expect(result.body).toBe("Invalid username or password")
+    expect(result.body.error).toBe("Invalid username or password")
   })
 
   test("returns 200 OK and JWT when password and username match", async () => {
