@@ -9,10 +9,10 @@ content-type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhcm9uMSIsImlkIjoiNjRhODcxZDFkMGVjMzQ4OTYxMGY4MmVjIiwiaWF0IjoxNjg4Nzc1NDIxfQ.He7VuSTQJ6N5HWGEeTlXs5P8RLnpUrJOS3t4CCsNBBA
 
 {
-  "title": "aarons blog",
-  "author": "Aaron",
-  "url": "aaronsblog.com",
-  "likes": 500,
+  "title": "asdf",
+  "author": "asdfasdf",
+  "url": "google.com",
+  "likes": 1000,
   "userId": "64a871d1d0ec3489610f82ec"
 }
 
@@ -22,7 +22,8 @@ GET http://localhost:3003/does/not/exist
 
 ### delete
 
-DELETE http://localhost:3003/api/blogs/64a4a9253604b05811a4eaee
+DELETE http://localhost:3003/api/blogs/64a8b25c6d8d18772a6d1421
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhcm9uMSIsImlkIjoiNjRhODcxZDFkMGVjMzQ4OTYxMGY4MmVjIiwiaWF0IjoxNjg4Nzc1NDIxfQ.He7VuSTQJ6N5HWGEeTlXs5P8RLnpUrJOS3t4CCsNBBA
 
 ### update
 
