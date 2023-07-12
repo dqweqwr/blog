@@ -27,8 +27,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhc
 
 ### update
 
-PUT http://localhost:3003/api/blogs/64a4a9253604b05811a4eaee
+PUT http://localhost:3003/api/blogs/64ae865e95249e98138e1697
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhcm9uMSIsImlkIjoiNjRhZTg1ZDc5NTI0OWU5ODEzOGUxNjg3IiwiaWF0IjoxNjg5MTc5Mjg4fQ.rs6JPxPaBckNATyiRKdgOPeEEq56uudmh_o0f7PNCh0
 
 {
   "title": "Hello world",
