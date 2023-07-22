@@ -14,18 +14,18 @@ beforeEach(async () => {
   const newUser = new User({
     username: "johnson",
     name: "Johnson",
-    passwordHash
+    passwordHash,
   })
 
   await newUser.save()
 }, 10000)
 
-describe("POST /api/users" , () => {
+describe("POST /api/users", () => {
   test("successfully creates a account when all input is valid and username is unique", async () => {
     const newUser = {
       username: "testuser",
       name: "Bob",
-      password: "12345678"
+      password: "12345678",
     }
 
     const response = await api
@@ -44,39 +44,30 @@ describe("POST /api/users" , () => {
     const newUser = {
       username: "q",
       name: "Bob",
-      password: "12345678"
+      password: "12345678",
     }
 
-    await api
-      .post("/api/users")
-      .send(newUser)
-      .expect(400)
+    await api.post("/api/users").send(newUser).expect(400)
   })
 
   test("when password is too short dont create account", async () => {
     const newUser = {
       username: "testuser",
       name: "Bob",
-      password: "123"
+      password: "123",
     }
 
-    await api
-      .post("/api/users")
-      .send(newUser)
-      .expect(400)
+    await api.post("/api/users").send(newUser).expect(400)
   })
 
   test("fails when trying to create account with a already existing username", async () => {
     const newUser = {
       username: "johnson",
       name: "Bob",
-      password: "12345678"
+      password: "12345678",
     }
 
-    await api
-      .post("/api/users")
-      .send(newUser)
-      .expect(400)
+    await api.post("/api/users").send(newUser).expect(400)
   })
 })
 

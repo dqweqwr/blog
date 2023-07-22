@@ -9,7 +9,7 @@ const createUser = async (username) => {
   const newUser = new User({
     username,
     name: "asdf",
-    passwordHash
+    passwordHash,
   })
 
   await newUser.save()
@@ -19,13 +19,10 @@ const createUser = async (username) => {
 const generateToken = (user) => {
   const tokenPayload = {
     username: user.username,
-    id: user.id
+    id: user.id,
   }
 
-  const token = jwt.sign(
-    tokenPayload,
-    process.env.SECRET
-  )
+  const token = jwt.sign(tokenPayload, process.env.SECRET)
 
   return token
 }
@@ -56,9 +53,9 @@ const nonExistentBlog = async () => {
     title: "Josh's blog",
     author: "Josh",
     url: "https://www.joshsblog.com",
-    likes: 50
+    likes: 50,
   })
-  
+
   await blog.save()
   await blog.deleteOne()
   return blog
@@ -66,7 +63,7 @@ const nonExistentBlog = async () => {
 
 const getBlogs = async () => {
   const blogs = await Blog.find({})
-  return blogs.map(b => b.toJSON())
+  return blogs.map((b) => b.toJSON())
 }
 
 module.exports = {
@@ -74,5 +71,5 @@ module.exports = {
   getBlogs,
   nonExistentBlog,
   createUser,
-  generateToken
+  generateToken,
 }

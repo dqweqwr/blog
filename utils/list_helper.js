@@ -6,11 +6,8 @@ const dummy = (blogs) => {
 
 // finds the sum of likes in all blog posts
 const totalLikes = (blogs) => {
-  const likes = blogs.map(blog => blog.likes)
-  const allLikes = likes.reduce(
-    (sum, currentValue) => sum += currentValue,
-    0
-  ) 
+  const likes = blogs.map((blog) => blog.likes)
+  const allLikes = likes.reduce((sum, currentValue) => (sum += currentValue), 0)
 
   return allLikes
 }
@@ -20,7 +17,7 @@ const favoriteBlog = (blogs) => {
   if (blogs.length === 0) return null
 
   let currentFavorite = blogs[0]
-  blogs.forEach(blog => {
+  blogs.forEach((blog) => {
     if (blog.likes > currentFavorite.likes) {
       currentFavorite = blog
     }

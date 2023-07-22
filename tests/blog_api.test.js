@@ -17,7 +17,7 @@ beforeEach(async () => {
   for (let blog of helper.initialBlogs) {
     const blogObject = new Blog({
       ...blog,
-      user: alice._id
+      user: alice._id,
     })
     const savedBlog = await blogObject.save()
     alice.blogs = alice.blogs.concat(savedBlog._id)
@@ -28,22 +28,20 @@ beforeEach(async () => {
 describe("GET /api/blogs", () => {
   test("list of blogs is returned as json", async () => {
     await api
-    .get("/api/blogs")
-    .expect(200)
-    .expect("Content-Type", /application\/json/)
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/)
   })
 
   test("number of blogs returned matches length of initalBlogs array", async () => {
-    const response = await api
-      .get("/api/blogs")
+    const response = await api.get("/api/blogs")
 
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
   test("unique identifier of blog posts is named 'id'", async () => {
-    const response = await api
-      .get("/api/blogs")
-    response.body.map(blog => {
+    const response = await api.get("/api/blogs")
+    response.body.map((blog) => {
       expect(blog.id).toBeDefined()
       expect(blog._id).toBeFalsy()
     })
@@ -73,7 +71,7 @@ describe("POST /api/blogs", () => {
 
     expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
-    const titles = blogsAtEnd.map(blog => blog.title)
+    const titles = blogsAtEnd.map((blog) => blog.title)
     expect(titles).toContain("new blog asdf")
   })
 
@@ -84,7 +82,7 @@ describe("POST /api/blogs", () => {
     const newBlog = {
       title: "another new blog",
       author: "asdf",
-      url: "https://www.asdf.com"
+      url: "https://www.asdf.com",
     }
 
     const response = await api
@@ -105,10 +103,11 @@ describe("POST /api/blogs", () => {
     const newBlog = {
       author: "forgot the title",
       url: "https://www.asdf.com",
-      likes: 100
+      likes: 100,
     }
 
-    await api.post("/api/blogs")
+    await api
+      .post("/api/blogs")
       .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
@@ -121,10 +120,11 @@ describe("POST /api/blogs", () => {
     const newBlog = {
       title: "new blog",
       author: "forgot the url",
-      likes: 100
+      likes: 100,
     }
 
-    await api.post("/api/blogs")
+    await api
+      .post("/api/blogs")
       .set("Authorization", `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
@@ -153,13 +153,10 @@ describe("PUT /api/blogs/:id", () => {
     const firstBlog = blogsAtStart[0]
     const newBlog = {
       ...firstBlog,
-      likes: firstBlog.likes + 1
+      likes: firstBlog.likes + 1,
     }
 
-    await api
-      .put(`/api/blogs/${firstBlog.id}`)
-      .send(newBlog)
-      .expect(200)
+    await api.put(`/api/blogs/${firstBlog.id}`).send(newBlog).expect(200)
 
     const updatedBlog = await Blog.findById(firstBlog.id)
     expect(updatedBlog.likes).toBe(firstBlog.likes + 1)
@@ -170,13 +167,10 @@ describe("PUT /api/blogs/:id", () => {
     const firstBlog = blogsAtStart[0]
     const newBlog = {
       ...firstBlog,
-      url: null
+      url: null,
     }
 
-    await api
-      .put(`/api/blogs/${firstBlog.id}`)
-      .send(newBlog)
-      .expect(400)
+    await api.put(`/api/blogs/${firstBlog.id}`).send(newBlog).expect(400)
   })
 
   test("returns status code 400 for malformatted id", async () => {
@@ -185,7 +179,7 @@ describe("PUT /api/blogs/:id", () => {
       title: "Hello world",
       author: "Bob",
       url: "bobsblog.com",
-      likes: 2000
+      likes: 2000,
     }
 
     const response = await api
@@ -205,13 +199,10 @@ describe("PUT /api/blogs/:id", () => {
       title: "Hello world",
       author: "Bob",
       url: "bobsblog.com",
-      likes: 2000
+      likes: 2000,
     }
 
-    await api
-      .put(`/api/blogs/${nonExistentId}`)
-      .send(newBlog)
-      .expect(404)
+    await api.put(`/api/blogs/${nonExistentId}`).send(newBlog).expect(404)
   })
 })
 
@@ -231,7 +222,7 @@ describe("DELETE /api/blogs/:id", () => {
     const blogsAtEnd = await helper.getBlogs()
     expect(blogsAtStart.length - 1).toBe(blogsAtEnd.length)
 
-    const blogIds = blogsAtEnd.map(blog => blog.id)
+    const blogIds = blogsAtEnd.map((blog) => blog.id)
     expect(blogIds).not.toContain(blogToDelete.id)
   })
 

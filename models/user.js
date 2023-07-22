@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: 3,
-    unique: true
+    unique: true,
   },
   name: String,
   passwordHash: {
@@ -16,9 +16,9 @@ const userSchema = new mongoose.Schema({
   blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Blog"
-    }
-  ]
+      ref: "Blog",
+    },
+  ],
 })
 
 userSchema.plugin(uniqueValidator)
@@ -29,7 +29,7 @@ userSchema.set("toJSON", {
     delete returnedObj._id
     delete returnedObj.__v
     delete returnedObj.passwordHash
-  }
+  },
 })
 
 module.exports = mongoose.model("User", userSchema)

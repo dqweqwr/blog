@@ -14,7 +14,7 @@ beforeEach(async () => {
   const newUser = new User({
     username: "testuser",
     name: "Dave",
-    passwordHash: hashedPassword
+    passwordHash: hashedPassword,
   })
 
   await newUser.save()
@@ -24,7 +24,7 @@ describe("POST /api/login", () => {
   test("returns 401 unauthorized if password is invalid", async () => {
     const loginCredentials = {
       username: "testuser",
-      password: "wrongpassword"
+      password: "wrongpassword",
     }
 
     const result = await api
@@ -39,7 +39,7 @@ describe("POST /api/login", () => {
   test("returns 401 unauthorized if username is invalid", async () => {
     const loginCredentials = {
       username: "thisuserdoesntexist",
-      password: "123456"
+      password: "123456",
     }
 
     const result = await api
@@ -54,7 +54,7 @@ describe("POST /api/login", () => {
   test("returns 200 OK and JWT when password and username match", async () => {
     const loginCredentials = {
       username: "testuser",
-      password: "123456"
+      password: "123456",
     }
 
     const result = await api
