@@ -3,9 +3,16 @@ const Blog = require("../models/blog")
 const middleware = require("../utils/middleware")
 
 blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog
-    .find({}).populate("user", { username: 1, name: 1 })
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 })
   response.json(blogs)
+})
+
+blogsRouter.get("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate("user", {
+    username: 1,
+    name: 1,
+  })
+  response.json(blog)
 })
 
 blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
@@ -14,7 +21,7 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 
   const blog = new Blog({
     ...body,
-    user: user.id
+    user: user.id,
   })
 
   const savedBlog = await blog.save()
@@ -25,19 +32,23 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
-  const user = request.user
-  const blog = await Blog.findById(request.params.id)
+blogsRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response) => {
+    const user = request.user
+    const blog = await Blog.findById(request.params.id)
 
-  if (blog === null) return response.status(204).end()
+    if (blog === null) return response.status(204).end()
 
-  if (blog.user.toString() !== user.id.toString()) {
-    return response.status(401).json({ error: "you dont own this resource" })
-  }
+    if (blog.user.toString() !== user.id.toString()) {
+      return response.status(401).json({ error: "you dont own this resource" })
+    }
 
-  await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
-})
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  },
+)
 
 blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   const { title, author, url, likes, user } = request.body
@@ -45,7 +56,7 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
     { title, author, url, likes, user },
-    { new: true, runValidators: true, context: "query" }
+    { new: true, runValidators: true, context: "query" },
   )
 
   if (updatedBlog === null) {

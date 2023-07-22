@@ -7,7 +7,7 @@ usersRouter.post("/", async (request, response) => {
 
   if (password.length < 6) {
     return response.status(400).send({
-      error: "password has to be at least 6 characters"
+      error: "password has to be at least 6 characters",
     })
   }
 
@@ -17,7 +17,7 @@ usersRouter.post("/", async (request, response) => {
   const user = new User({
     username,
     name,
-    passwordHash
+    passwordHash,
   })
 
   const savedUser = await user.save()
@@ -25,15 +25,23 @@ usersRouter.post("/", async (request, response) => {
 })
 
 usersRouter.get("/", async (request, response) => {
-  const users = await User
-    .find({})
-    .populate("blogs", {
-      title: 1,
-      url: 1,
-      likes: 1,
-      author: 1
-    })
+  const users = await User.find({}).populate("blogs", {
+    title: 1,
+    url: 1,
+    likes: 1,
+    author: 1,
+  })
   response.json(users)
+})
+
+usersRouter.get("/:id", async (request, response) => {
+  const user = await User.findById(request.params.id).populate("blogs", {
+    title: 1,
+    url: 1,
+    likes: 1,
+    author: 1,
+  })
+  response.json(user)
 })
 
 module.exports = usersRouter

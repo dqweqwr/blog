@@ -3,12 +3,12 @@ const mongoose = require("mongoose")
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   author: String,
   url: {
     type: String,
-    required: true
+    required: true,
   },
   likes: {
     type: Number,
@@ -16,16 +16,17 @@ const blogSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  }
+    ref: "User",
+  },
 })
 
 blogSchema.set("toJSON", {
   transform: (document, returnedObj) => {
     returnedObj.id = returnedObj._id.toString()
+    returnedObj.createdAt = returnedObj._id.getTimestamp()
     delete returnedObj._id
     delete returnedObj.__v
-  }
+  },
 })
 
 module.exports = mongoose.model("Blog", blogSchema)
