@@ -37,3 +37,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhc
   "url": "bobsblog.com",
   "likes": 2000
 }
+
+POST http://localhost:3003/api/blogs/64ae865e95249e98138e1697/comments
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhcm9uMSIsImlkIjoiNjRhZTg1ZDc5NTI0OWU5ODEzOGUxNjg3IiwiaWF0IjoxNjkwMDUxNTI0fQ.MLue5W26OdznAdACTcVF66XPxszDjGNvUDMX1nN0Xk8
+
+{
+  "content": "My first comment"
+}
